@@ -1,0 +1,24 @@
+---
+- name: Install container tools
+  hosts: servers
+  tasks:
+    - name: Install podman, buildah and skopeo
+      dnf:
+        name: 
+          - podman
+          - podman-docker
+          - buildah
+          - skopeo
+        state: latest
+    - name: Enable ansible RHSM repo
+      rhsm_repository:
+        name: ansible-2.8-for-rhel-8-x86_64-rpms
+    - name: Install ansible
+      dnf:
+        name:
+          - ansible
+    - name: Get Fedora 30 container image
+      podman_image:
+        name: registry.fedoraproject.org/fedora-minimal
+        tag: 30
+

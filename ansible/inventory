@@ -1,0 +1,3 @@
+[servers]
+rhel8demo.local ansible_python_interpreter=/usr/bin/python3
+

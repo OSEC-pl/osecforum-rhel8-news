@@ -50,9 +50,54 @@
 
 \newcommand{\tri}{$\triangleright$ }
 
-\lstset{
-   language=C,
-   basicstyle=\tiny,
+
+\newcommand\YAMLcolonstyle{\color{red}\mdseries}
+\newcommand\YAMLkeystyle{\color{black}\bfseries}
+\newcommand\YAMLvaluestyle{\color{black}\mdseries}
+
+\makeatletter
+
+\newcommand\language@yaml{yaml}
+
+\expandafter\expandafter\expandafter\lstdefinelanguage
+\expandafter{\language@yaml}
+{
+  keywords={true,false,null,y,n},
+  keywordstyle=\color{darkgray}\bfseries,
+  basicstyle=\YAMLkeystyle,                                 % assuming a key comes first
+  sensitive=false,
+  comment=[l]{\#},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\YAMLvaluestyle\ttfamily,
+  moredelim=[l][\color{orange}]{\&},
+  moredelim=[l][\color{magenta}]{*},
+  moredelim=**[il][\YAMLcolonstyle{:}\YAMLvaluestyle]{:},   % switch to value style at :
+  morestring=[b]',
+  morestring=[b]",
+  literate =    {---}{{\ProcessThreeDashes}}3
+                {>}{{\textcolor{red}\textgreater}}1     
+                {|}{{\textcolor{red}\textbar}}1 
+                {\ -\ }{{\mdseries\ -\ }}3,
+}
+
+% switch to key style at EOL
+\lst@AddToHook{EveryLine}{\ifx\lst@language\language@yaml\YAMLkeystyle\fi}
+\makeatother
+
+\newcommand\ProcessThreeDashes{\llap{\color{cyan}\mdseries-{-}-}}
+
+\lstdefinestyle{yaml}
+{
+   language=yaml,
+   basicstyle=\small\ttfamily,
+   breaklines=true,
+   escapechar=\@,
+}
+\lstdefinestyle{bash}
+{
+   language=bash,
+   basicstyle=\tiny\ttfamily,
    breaklines=true,
    escapechar=\@,
 }
@@ -79,9 +124,42 @@
 \end{center}
 \end{frame}
 
+% cock-pit
+
+% omg IdM w cockpicie
+
+% lorax-composer
+
+% dnf yum
+% modularność, application streams - a idea SCL
+% zaktualizowane języki programowania - python3, php7 w bazie
+% postgresql 10, 9.6, mariadb 10.3, mysql 8, redis 5
+% varnish
+
+% nftables, firewalld
+% ipvlan w kontenerach
+
+% wayland! gnom 3.28, fallback do X11
+
+% v6 only boot
+
+% authselect, authconfig plz die
+%
+
 \begin{frame}[fragile]
-	\frametitle{Kontenery w RHEL 8 a docker}
+	\frametitle{Nowe narzędzia do konteneryzacji}
 \begin{table}[]
+\begin{itemize}
+	\item podman
+	\begin{itemize}
+		\item Fully supported, not a technology preview!
+		\item Daemonless!
+		\item User-containers! (Tech prev)
+		\item Plays well with systemd!
+		\item Red Hat Universal Base Images (UBI) are newly available. No subscription!
+		\item ARM!
+	\end{itemize}
+\end{itemize}
 \centering
 \caption{Docker vs podman compat vs podman native.}
 \label{porownanie}
@@ -98,12 +176,26 @@ docker foo & bar \\ \hline
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Przykład: foo}
-\begin{lstlisting}
-int main(void) {
-	return 0;
-}
-\end{lstlisting}
+	\frametitle{Instalacja narzędzi do konteneryzacji za pomocą Ansible}
+%\begin{lstlisting}[language=yaml]
+%---
+%key: value
+%---
+%\end{lstlisting}
+	\lstinputlisting[style=yaml,firstline=1,lastline=12]{../ansible/deploy-container-tools.yml}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Instalacja narzędzi do konteneryzacji za pomocą Ansible}
+\begin{center}
+\includegraphics[scale=0.13]{img-ansibleinception.jpg}
+\end{center}
+\lstinputlisting[style=yaml,firstline=13]{../ansible/deploy-container-tools.yml}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Budowanie kontenera za pomocą buildah}
+\lstinputlisting[style=bash]{../buildah-example/build-container.sh}
 \end{frame}
 
 \begin{frame}
