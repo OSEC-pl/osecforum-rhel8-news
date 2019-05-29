@@ -113,32 +113,77 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{RHEL 8\ldots marketingowo!}
+\frametitle{RHEL 8 już dostępny}
+\begin{center}
+\includegraphics[scale=0.1]{img-rhlogo.png}
+\end{center}
 \begin{itemize}
+	\item 8 Maja 2019 -- wydanie Red Hat Enterprise Linux 8
 	\item ,,Cloud-native OS''
 	\item ,,Brinding hybrid cloud to DevOps''
-	\item \href{http://www.redhat.com}{Red Hat}
-	\item Fooba {\tt foobar} {\em bardzo}.
-	\item Infrastructure as a Code.
+	\item Co zmienia się od strony technicznej?
+	\item Ogromna ilość zmian -- część backportowana do RHEL 7
+	\item Zarządzanie konfiguracją RHEL\ldots
+	\begin{itemize}
+		\item Klasyczna Unixowa linia komend
+		\item Interfejs web (cockpit)
+		\item Ansible -- sukcesywne wdrażanie {\em Infrastructure as a Code}
+	\end{itemize}
 \end{itemize}
 \begin{center}
 \end{center}
 \end{frame}
 
-% cock-pit
+\begin{frame}
+\frametitle{Cockpit v185}
+\begin{itemize}
+	\item Zaawansowany interfejs webowy oparty na pluginach.
+	\item Zmiany wykonane za pomocą cockpita lądują we właściwych miejscach w systemie
+	\item Zarządzanie przez DBus, API, biblioteki -- cockpit unika opakowywania poleceń powłoki
+	\item Standardowo włączony w RHEL 8 (poza instalacją minimal)
+	\item Integracja z Red Hat IdM (IPA)
+	\item {\tt dnf install cockpit\textbackslash* }
+	\item {\tt systemctl enable --now cockpit.socket}
+\end{itemize}
+\begin{center}
+\end{center}
+\end{frame}
 
-% omg IdM w cockpicie
+\begin{frame}
+\frametitle{YUM v4 (dnf)}
+\begin{itemize}
+	\item Kompatybilność wsteczna z klasycznym {\tt yum}
+	\item Modularyzacja systemu
+	\item {\em Application Streams}
+	\item Dostarczanie wielu niezależnych od siebie wersji oprogramowania w ramach jednej dystrybucji OS
+	\item Zachowanie kompatybilności na poziomie API i ABI w ramach konkretnej wersji strumienia
+\end{itemize}
+\begin{center}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{YUM v4 (dnf)}
+\begin{itemize}
+	\item Usługi dostępne w alternatywnych wersjach
+	\item Np. PostgreSQL 9.6 oraz 10
+	\item Np. MariaDB 10.3 oraz MySQL 8
+	\item Modularyzacja dotyczy nie tylko usług ale też języków programowania i frameworków
+	\item Pojawią się strumienie z nowszymi wersjami paczek w ramach życia RHEL 8 (np. php)
+	\item {\tt dnf module enable postgresql:10}
+	\item {\tt dnf module install postgresql:10}
+\end{itemize}
+\begin{center}
+\end{center}
+\end{frame}
+
+
 
 % lorax-composer
 
-% dnf yum
-% modularność, application streams - a idea SCL
-% zaktualizowane języki programowania - python3, php7 w bazie
-% postgresql 10, 9.6, mariadb 10.3, mysql 8, redis 5
-% varnish
-
 % nftables, firewalld
 % ipvlan w kontenerach
+
 
 % wayland! gnom 3.28, fallback do X11
 
@@ -149,19 +194,27 @@
 
 \begin{frame}[fragile]
 	\frametitle{Nowe narzędzia do konteneryzacji}
-\begin{table}[]
 \begin{itemize}
-	\item podman
-	\begin{itemize}
-		\item Fully supported, not a technology preview!
-		\item Daemonless!
-		\item User-containers! (Tech prev)
-		\item Plays well with systemd!
-		\item Red Hat Universal Base Images (UBI) are newly available. No subscription!
-		\item ARM!
-	\end{itemize}
+	\item RHEL 8 nie dostarcza Dockera
+	\item Dla instalacji lokalnych, developmentu: podman
+	\item Dla dużej skali (Kubernetes, OpenShift): CRI-O
+	\item Red Hat Universal Base Images (UBI)
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{podman}
+	\begin{itemize}
+		\item Nowoczesne narzędzie do zarządznia lokalnymi kontenerami
+		\item W pełni wspierany, to nie jest {\em tech preview}!
+		\item Prostota konfiguracji, brak daemonów
+		\item Kontenery działające na kontach użytkowników nieuprzywilejowanych
+		\item Dobra integracja z systemd
+		\item Kompatybilność wsteczna z Dockerem ({\tt podman-docker})
+		\item Ułatwienie migracji do Kubernetesa ({\tt podman generate kube, podman play kube})
+	\end{itemize}
 \centering
+	\begin{table}
 \caption{Docker vs podman compat vs podman native.}
 \label{porownanie}
 \scriptsize
@@ -197,6 +250,16 @@ docker foo & bar \\ \hline
 \begin{frame}[fragile]
 	\frametitle{Budowanie kontenera za pomocą buildah}
 \lstinputlisting[style=bash]{../buildah-example/build-container.sh}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Aktualizacja stosu graficznego}
+\begin{itemize}
+	\item{Wayland domyślnym serwerem dla aplikacji graficznych}
+	\item{Powrót do X11 w dalszym ciągu obsługiwany}
+	\item{GNOME 3.28}
+	\item \href{http://www.redhat.com}{Red Hat}
+\end{itemize}
 \end{frame}
 
 \begin{frame}

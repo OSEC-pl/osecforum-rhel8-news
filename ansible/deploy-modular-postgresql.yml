@@ -1,0 +1,8 @@
+---
+- name: Install container tools
+  hosts: servers
+  tasks:
+    - name: Install PostgreSQL 10
+      dnf:
+        name: '@postgresql:10'
+
