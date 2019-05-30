@@ -92,14 +92,14 @@
    language=yaml,
    basicstyle=\small\ttfamily,
    breaklines=true,
-   escapechar=\@,
+%   escapechar=\@,
 }
 \lstdefinestyle{bash}
 {
    language=bash,
    basicstyle=\tiny\ttfamily,
    breaklines=true,
-   escapechar=\@,
+%   escapechar=\@,
 }
 
 \title{Nowości w Red Hat Enterprise Linux 8}
@@ -152,11 +152,13 @@
 \begin{frame}
 \frametitle{YUM v4 (dnf)}
 \begin{itemize}
+	\item Dandified YUM
 	\item Kompatybilność wsteczna z klasycznym {\tt yum}
 	\item Modularyzacja systemu
 	\item {\em Application Streams}
 	\item Dostarczanie wielu niezależnych od siebie wersji oprogramowania w ramach jednej dystrybucji OS
 	\item Zachowanie kompatybilności na poziomie API i ABI w ramach konkretnej wersji strumienia
+	\item Budowanie paczek zgodnie z ideologią SCL w dalszym ciągu obsługiwane
 \end{itemize}
 \begin{center}
 \end{center}
@@ -170,29 +172,39 @@
 	\item Np. MariaDB 10.3 oraz MySQL 8
 	\item Modularyzacja dotyczy nie tylko usług ale też języków programowania i frameworków
 	\item Pojawią się strumienie z nowszymi wersjami paczek w ramach życia RHEL 8 (np. php)
+	\item Indywidualny czas \href{https://access.redhat.com/node/4079021}{wspierania} każdego strumienia
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{YUM v4 (dnf)}
+\begin{itemize}
 	\item {\tt dnf module enable postgresql:10}
 	\item {\tt dnf module install postgresql:10}
 \end{itemize}
-\begin{center}
-\end{center}
+\lstinputlisting[style=yaml]{../ansible/deploy-modular-postgresql.yml}
 \end{frame}
-
-
 
 % lorax-composer
 
 % nftables, firewalld
 % ipvlan w kontenerach
 
-
-% wayland! gnom 3.28, fallback do X11
-
 % v6 only boot
 
 % authselect, authconfig plz die
 %
 
-\begin{frame}[fragile]
+\begin{frame}
+	\frametitle{RHEL 8 jako gość chmur IaaS}
+\begin{itemize}
+	\item {\tt cloud-init} 18.2
+	\item Customizacja obrazów RHEL dla chmur -- {\tt lorax-composer}
+	\item Pełna obsługa deploymentów IPv6 single stack (włącznie z PXE)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
 	\frametitle{Nowe narzędzia do konteneryzacji}
 \begin{itemize}
 	\item RHEL 8 nie dostarcza Dockera
