@@ -101,6 +101,11 @@
    breaklines=true,
 %   escapechar=\@,
 }
+\lstdefinestyle{cfg}
+{
+   basicstyle=\tiny\ttfamily,
+   breaklines=true,
+}
 
 \title{Nowości w Red Hat Enterprise Linux 8}
 \author{Radosław Kujawa -- radoslaw.kujawa@osec.pl}
@@ -137,9 +142,9 @@
 \begin{frame}
 \frametitle{Cockpit v185}
 \begin{itemize}
-	\item Zaawansowany interfejs webowy oparty na pluginach.
+	\item Zaawansowany interfejs webowy oparty na pluginach
 	\item Zmiany wykonane za pomocą cockpita lądują we właściwych miejscach w systemie
-	\item Zarządzanie przez DBus, API, biblioteki -- cockpit unika opakowywania poleceń powłoki
+	\item Wykonywanie zmian w konfiguracji przez DBus, API, biblioteki -- cockpit unika opakowywania poleceń powłoki
 	\item Standardowo włączony w RHEL 8 (poza instalacją minimal)
 	\item Integracja z Red Hat IdM (IPA)
 	\item {\tt dnf install cockpit\textbackslash* }
@@ -196,7 +201,7 @@
 %
 
 \begin{frame}
-	\frametitle{RHEL 8 jako gość chmur IaaS}
+	\frametitle{RHEL 8 jako gość chmur IaaS i klasycznych hypervisorów}
 \begin{itemize}
 	\item {\tt cloud-init} 18.2
 	\item Customizacja obrazów RHEL dla chmur -- {\tt lorax-composer}
@@ -219,10 +224,10 @@
 	\begin{itemize}
 		\item Nowoczesne narzędzie do zarządznia lokalnymi kontenerami
 		\item W pełni wspierany, to nie jest {\em tech preview}!
+		\item Bardzo intensywny rozwój
 		\item Prostota konfiguracji, brak daemonów
 		\item Kontenery działające na kontach użytkowników nieuprzywilejowanych
 		\item Dobra integracja z systemd
-		\item Kompatybilność wsteczna z Dockerem ({\tt podman-docker})
 		\item Ułatwienie migracji do Kubernetesa ({\tt podman generate kube, podman play kube})
 	\end{itemize}
 \centering
@@ -242,12 +247,36 @@ docker foo & bar \\ \hline
 \end{frame}
 
 \begin{frame}[fragile]
+	\frametitle{{\tt podman} -- integracja z {\tt systemd}}
+	\begin{itemize}
+		\item Kontenery {\tt podman} mogą działać jako usługi {\tt systemd}
+		\item Także na koncie nieuprzywilejowanego użytkownika
+		\item {\tt ExecStart} może uruchamiać pojedyńczy kontener lub wykonywać {\tt play kube}
+	\end{itemize}
+\begin{lstlisting}[style=cfg]
+[Unit]
+Description=My containerized service
+
+[Service]
+ExecStart=/usr/bin/podman start -a myservicecontainer 
+ExecStop=/usr/bin/podman stop -t 10 myservicecontainer 
+
+[Install]
+WantedBy=multi-user.target
+\end{lstlisting}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Kompatybilność wsteczna z Docker}
+	\begin{itemize}
+		\item Paczka {\tt podman-docker} dostarcza polecenie {\tt docker}
+		\item Implementacja Open Container Initiative (OCI) Runtime Specification - obrazy zbudowane w RHEL container tools działają z Dockerem i na odwrót\footnote{Zazwyczaj.}
+		\item {\tt podman} nie stara się implementować API Dockera - jest oparty o własną bibliotekę {\tt libpod}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
 	\frametitle{Instalacja narzędzi do konteneryzacji za pomocą Ansible}
-%\begin{lstlisting}[language=yaml]
-%---
-%key: value
-%---
-%\end{lstlisting}
 	\lstinputlisting[style=yaml,firstline=1,lastline=12]{../ansible/deploy-container-tools.yml}
 \end{frame}
 
@@ -260,8 +289,13 @@ docker foo & bar \\ \hline
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Budowanie kontenera za pomocą buildah}
+	\frametitle{Budowanie kontenera za pomocą {\tt buildah}}
 \lstinputlisting[style=bash]{../buildah-example/build-container.sh}
+\begin{itemize}
+	\item {\tt mkdir \$HOME/tmp/logs}
+	\item {\tt sudo chcon -t container\_file\_t \$HOME/tmp/logs}
+	\item {\tt podman run -p 7777:7777 -v \$HOME/tmp/logs/:/logs/ localhost/bcaas}
+\end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
