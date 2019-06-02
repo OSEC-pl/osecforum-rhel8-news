@@ -103,7 +103,7 @@
 }
 \lstdefinestyle{cfg}
 {
-   basicstyle=\tiny\ttfamily,
+   basicstyle=\small\ttfamily,
    breaklines=true,
 }
 
@@ -133,7 +133,9 @@
 		\item Klasyczna Unixowa linia komend
 		\item Interfejs web (cockpit)
 		\item Ansible -- sukcesywne wdrażanie {\em Infrastructure as a Code}
+% System roles
 	\end{itemize}
+	\item Satellite + Insights + Ansible... %$\leftarrow Admin 2.0
 \end{itemize}
 \begin{center}
 \end{center}
@@ -158,10 +160,11 @@
 \frametitle{YUM v4 (dnf)}
 \begin{itemize}
 	\item Dandified YUM
+	\item Python 3
 	\item Kompatybilność wsteczna z klasycznym {\tt yum}
 	\item Modularyzacja systemu
-	\item {\em Application Streams}
-	\item Dostarczanie wielu niezależnych od siebie wersji oprogramowania w ramach jednej dystrybucji OS
+	\item {\em Application Streams} -- odpowiedź na potrzeby twórców aplikacji, aby dostarczać wspierane alternatywne wersje oprogramowania
+	\item Wiele niezależnych od siebie wersji oprogramowania w ramach jednej dystrybucji OS
 	\item Zachowanie kompatybilności na poziomie API i ABI w ramach konkretnej wersji strumienia
 	\item Budowanie paczek zgodnie z ideologią SCL w dalszym ciągu obsługiwane
 \end{itemize}
@@ -178,6 +181,7 @@
 	\item Modularyzacja dotyczy nie tylko usług ale też języków programowania i frameworków
 	\item Pojawią się strumienie z nowszymi wersjami paczek w ramach życia RHEL 8 (np. php)
 	\item Indywidualny czas \href{https://access.redhat.com/node/4079021}{wspierania} każdego strumienia
+	\item System bazowy dalej objęty \href{https://access.redhat.com/support/policy/updates/errata}{10-letnim wsparciem} (+ ELS)
 \end{itemize}
 \end{frame}
 
@@ -190,32 +194,59 @@
 \lstinputlisting[style=yaml]{../ansible/deploy-modular-postgresql.yml}
 \end{frame}
 
-% lorax-composer
+\begin{frame}
+	\frametitle{Konfiguracja uwierzytelniania}
+	\begin{itemize}
+		\item {\tt authselect} zastępuje {\tt authconfig}
+		\item Ułatwiona konfiguracja {\tt PAM}, {\tt nsswitch}, {\tt sssd} oparta o profile
+		\item Obsługa {\em Smart Card}, tworzenia katalogów domowych przy pierwszym logowaniu, czytników linii papilarnych\ldots
+		\item {\tt authselect} {\bf nie} zastępuje {\tt ipa-client} dla Red Hat IdM ani {\tt realmd} dla Microsoft Active Directory
+		\item Kompatybilność wsteczna: {\tt authselect-compat}, {\tt authselect-migration(7)}
+	\end{itemize}
+\end{frame}
 
+\begin{frame}
+	\frametitle{RHEL 8 jako host wirtualizacji oraz chmur}
+\begin{itemize}
+	\item Nowe wersje {\tt kvm}, {\tt qemu}, {\tt libvirt}
+	\item {\tt cockpit} preferowanym GUI do zarządzania VMkami
+	\item IaaS -- Red Hat OpenStack 15
+	\item PaaS -- Red Hat OpenShift Container Platform 4
 % nftables, firewalld
-% ipvlan w kontenerach
-
-% v6 only boot
-
-% authselect, authconfig plz die
-%
+\end{itemize}
+\end{frame}
 
 \begin{frame}
 	\frametitle{RHEL 8 jako gość chmur IaaS i klasycznych hypervisorów}
 \begin{itemize}
 	\item {\tt cloud-init} 18.2
 	\item Customizacja obrazów RHEL dla chmur -- {\tt lorax-composer}
-	\item Pełna obsługa deploymentów IPv6 single stack (włącznie z PXE)
+	\item Pełna obsługa deploymentów IPv6 single stack (włącznie z PXE boot)
 \end{itemize}
+\end{frame}
+
+% lorax-composer
+\begin{frame}
+	\frametitle{Budowanie własnych obrazów RHEL 8}
+	\begin{itemize}
+		\item {\tt lorax-composer} -- usługa budująca obrazy, oferująca REST API
+% lorax-composer
+		\item Interfejs użytkownika -- {\tt composer-cli}, {\tt cockpit-composer}, {\tt welder-web}
+		\item {\tt systemctl enable --now lorax-composer.socket}
+		\item {\tt composer-cli blueprints list}, {\tt push}, {\tt save}\ldots
+		\item {\tt composer-cli compose start example-development qcow2}	\end{itemize}
+
 \end{frame}
 
 \begin{frame}
 	\frametitle{Nowe narzędzia do konteneryzacji}
 \begin{itemize}
 	\item RHEL 8 nie dostarcza Dockera
-	\item Dla instalacji lokalnych, developmentu: podman
-	\item Dla dużej skali (Kubernetes, OpenShift): CRI-O
+	\item Container Tools -- {\tt podman}, {\tt buildah}, {\tt skopeo}
+	\item Silnik dla instalacji lokalnych, developmentu: podman
+	\item Silnik dla dużej skali (Kubernetes, OpenShift): \href{https://cri-o.io/}{CRI-O}
 	\item Red Hat Universal Base Images (UBI)
+% ipvlan w kontenerach
 \end{itemize}
 \end{frame}
 
@@ -232,15 +263,16 @@
 	\end{itemize}
 \centering
 	\begin{table}
-\caption{Docker vs podman compat vs podman native.}
+\caption{Docker vs podman compatibility vs container tools native.}
 \label{porownanie}
 \scriptsize
 \begin{tabular}{llll}
 \hline
-docker & rhel8    \\ \hline
-docker run & podman run \\
-docker build & buildah  \\
-docker foo & bar \\ \hline
+docker & rhel 8 compat & rhel 8 native   \\ \hline
+	docker run & podman run & podman run \\
+	docker build & podman build & buildah  \\
+	docker pull & podman pull & skopeo copy \\ 
+	\ldots & \ldots & \ldots \\ \hline
 \end{tabular}
 \normalsize
 \end{table}
@@ -252,25 +284,19 @@ docker foo & bar \\ \hline
 		\item Kontenery {\tt podman} mogą działać jako usługi {\tt systemd}
 		\item Także na koncie nieuprzywilejowanego użytkownika
 		\item {\tt ExecStart} może uruchamiać pojedyńczy kontener lub wykonywać {\tt play kube}
+		\item Mechanizm {\em socket activation} w połączeniu z kontenerami
 	\end{itemize}
-\begin{lstlisting}[style=cfg]
-[Unit]
-Description=My containerized service
-
-[Service]
-ExecStart=/usr/bin/podman start -a myservicecontainer 
-ExecStop=/usr/bin/podman stop -t 10 myservicecontainer 
-
-[Install]
-WantedBy=multi-user.target
-\end{lstlisting}
+%\begin{lstlisting}[style=cfg]
+\lstinputlisting[style=cfg]{../podman-systemd/mycontainer.service}
+% or stunnelized stdio
 \end{frame}
 
 \begin{frame}
 	\frametitle{Kompatybilność wsteczna z Docker}
 	\begin{itemize}
 		\item Paczka {\tt podman-docker} dostarcza polecenie {\tt docker}
-		\item Implementacja Open Container Initiative (OCI) Runtime Specification - obrazy zbudowane w RHEL container tools działają z Dockerem i na odwrót\footnote{Zazwyczaj.}
+		\item Implementacja Open Container Initiative (OCI) Runtime Specification -- obrazy zbudowane w RHEL container tools działają z Dockerem i na odwrót
+%\footnote{Zazwyczaj\ldots}
 		\item {\tt podman} nie stara się implementować API Dockera - jest oparty o własną bibliotekę {\tt libpod}
 	\end{itemize}
 \end{frame}

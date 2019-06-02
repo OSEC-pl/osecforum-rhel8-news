@@ -1,0 +1,10 @@
+[Unit]
+Description=My containerized service
+
+[Service]
+ExecStart=/usr/bin/podman start -a mycontainer
+ExecStop=/usr/bin/podman stop -t 10 mycontainer
+
+[Install]
+WantedBy=multi-user.target
+
