@@ -5,7 +5,7 @@
     - name: Enable ansible RHSM repo
       rhsm_repository:
         name: ansible-2.8-for-rhel-8-x86_64-rpms
-    - name: Install ansible and git
+    - name: Install ansible
       dnf:
         name: ansible
 - name: Install unprivileged ansible-bender and example playbooks
