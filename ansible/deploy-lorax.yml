@@ -9,3 +9,5 @@
     - systemd:
         name: lorax-composer.socket
         state: started
+        enabled: true
+

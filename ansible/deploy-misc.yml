@@ -1,11 +1,36 @@
 ---
+# this playbook will be executed before the presentation
+- name: Install Python 3
+  hosts: servers
+  gather_facts: False
+  tasks:
+    - raw: test -e /usr/bin/python3 || (dnf -y install python36)
 - name: Install misc stuff for RHEL 8 demo
   hosts: servers
   tasks:
-    - dnf:
+    - name: Install various command line tools
+      dnf:
         name:
           - bash-completion
           - mc
           - git
           - vim-enhanced
+    - name: Install Cockpit and plugins
+      dnf:
+        name:
+          - cockpit
+          - cockpit-bridge
+          - cockpit-composer
+          - cockpit-dashboard
+          - cockpit-doc
+          - cockpit-machines
+          - cockpit-packagekit
+          - cockpit-pcp
+          - cockpit-session-recording
+          - cockpit-storaged
+          - cockpit-systemd
+    - systemd:
+        name: cockpit.socket
+        state: started
+        enabled: true
 
