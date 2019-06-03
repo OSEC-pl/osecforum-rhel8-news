@@ -1,0 +1,21 @@
+---
+- name: Install ansible
+  hosts: servers
+  tasks:
+    - name: Enable ansible RHSM repo
+      rhsm_repository:
+        name: ansible-2.8-for-rhel-8-x86_64-rpms
+    - name: Install ansible and git
+      dnf:
+        name: ansible
+- name: Install unprivileged ansible-bender and example playbooks
+  become: false
+  hosts: servers
+  tasks:
+    - pip:
+       name: ansible-bender 
+       extra_args: --user
+    - git:
+       repo: 'https://github.com/OSEC-pl/osecforum-rhel8-news.git'
+       dest: osecforum-rhel8-news
+

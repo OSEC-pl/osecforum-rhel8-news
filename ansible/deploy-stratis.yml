@@ -1,0 +1,11 @@
+---
+- name: Install Stratis
+  hosts: servers
+  tasks:
+    - dnf:
+        name:
+          - stratisd
+          - stratis-cli
+    - systemd:
+        name: stratisd.service
+        state: started

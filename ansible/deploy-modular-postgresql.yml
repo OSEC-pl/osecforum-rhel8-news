@@ -2,6 +2,6 @@
 - name: Install PostgreSQL 10
   hosts: servers
   tasks:
-      dnf:
+    - dnf:
         name: '@postgresql:10'
 

@@ -1,0 +1,17 @@
+---
+- hosts: all
+  vars:
+    ansible_bender:
+      base_image: registry.fedoraproject.org/fedora:30
+
+      target_image:
+        name: myimage
+        labels:
+          built-by: '{{ ansible_user }}'
+        environment:
+          FOO: bar
+  tasks:
+  - dnf: 
+      name: mc 
+      state: latest
+

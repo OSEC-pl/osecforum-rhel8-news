@@ -1,0 +1,11 @@
+---
+- name: Install lorax-composer
+  hosts: servers
+  tasks:
+    - dnf:
+        name:
+          - lorax-composer
+          - composer-cli 
+    - systemd:
+        name: lorax-composer.socket
+        state: started

@@ -1,0 +1,11 @@
+---
+- name: Install misc stuff for RHEL 8 demo
+  hosts: servers
+  tasks:
+    - dnf:
+        name:
+          - bash-completion
+          - mc
+          - git
+          - vim-enhanced
+

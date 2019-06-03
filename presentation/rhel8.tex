@@ -206,10 +206,26 @@
 \end{frame}
 
 \begin{frame}
+	\frametitle{Stratis}
+\begin{itemize}
+	\item {\tt BTRFS} nie jest już wspierany, {\tt ZFS} nigdy nie był\ldots
+	\item \href{https://stratis-storage.github.io/}{Stratis} -- zarządzanie przestrzenią blokową i systemami plików w jednym narzędziu
+	\item {\em Thin provisioning}, cache na dyskach SSD, snapshoty, w przyszłości redundancja
+	\item {\tt stratis pool create testpool /dev/vdb} 
+	\item {\tt stratis filesystem create testpool testfs1}
+	\item {\tt stratis filesystem create testpool testfs2}
+	\item {\tt stratis filesystem list}
+	\item {\tt mount /stratis/testpool/testfs1 /mnttest1}
+	\item Warstwa systemu plików zachowuje się jak XFS\ldots bo to jest XFS
+\end{itemize}	
+\end{frame}
+
+\begin{frame}
 	\frametitle{RHEL 8 jako host wirtualizacji oraz chmur}
 \begin{itemize}
 	\item Nowe wersje {\tt kvm}, {\tt qemu}, {\tt libvirt}
-	\item {\tt cockpit} preferowanym GUI do zarządzania VMkami
+	\item {\tt cockpit} preferowanym GUI do zarządzania lokalnymi VMkami
+	\item klasyczna wirtualizacja -- Red Hat Virtualization 4.x
 	\item IaaS -- Red Hat OpenStack 15
 	\item PaaS -- Red Hat OpenShift Container Platform 4
 % nftables, firewalld
@@ -242,7 +258,7 @@
 	\frametitle{Nowe narzędzia do konteneryzacji}
 \begin{itemize}
 	\item RHEL 8 nie dostarcza Dockera
-	\item Container Tools -- {\tt podman}, {\tt buildah}, {\tt skopeo}
+	\item Container tools -- {\tt podman}, {\tt buildah}, {\tt skopeo}
 	\item Silnik dla instalacji lokalnych, developmentu: podman
 	\item Silnik dla dużej skali (Kubernetes, OpenShift): \href{https://cri-o.io/}{CRI-O}
 	\item Red Hat Universal Base Images (UBI)
@@ -261,21 +277,6 @@
 		\item Dobra integracja z systemd
 		\item Ułatwienie migracji do Kubernetesa ({\tt podman generate kube, podman play kube})
 	\end{itemize}
-\centering
-	\begin{table}
-\caption{Docker vs podman compatibility vs container tools native.}
-\label{porownanie}
-\scriptsize
-\begin{tabular}{llll}
-\hline
-docker & rhel 8 compat & rhel 8 native   \\ \hline
-	docker run & podman run & podman run \\
-	docker build & podman build & buildah  \\
-	docker pull & podman pull & skopeo copy \\ 
-	\ldots & \ldots & \ldots \\ \hline
-\end{tabular}
-\normalsize
-\end{table}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -299,19 +300,26 @@ docker & rhel 8 compat & rhel 8 native   \\ \hline
 %\footnote{Zazwyczaj\ldots}
 		\item {\tt podman} nie stara się implementować API Dockera - jest oparty o własną bibliotekę {\tt libpod}
 	\end{itemize}
+\centering
+	\begin{table}
+\caption{Docker vs podman compatibility vs container tools native.}
+\label{porownanie}
+\scriptsize
+\begin{tabular}{llll}
+\hline
+docker & rhel 8 compat & rhel 8 native   \\ \hline
+	docker run & podman run & podman run \\
+	docker build & podman build & buildah  \\
+	docker pull & podman pull & skopeo copy \\ 
+	\ldots & \ldots & \ldots \\ \hline
+\end{tabular}
+\normalsize
+\end{table}
 \end{frame}
 
 \begin{frame}[fragile]
 	\frametitle{Instalacja narzędzi do konteneryzacji za pomocą Ansible}
-	\lstinputlisting[style=yaml,firstline=1,lastline=12]{../ansible/deploy-container-tools.yml}
-\end{frame}
-
-\begin{frame}[fragile]
-	\frametitle{Instalacja narzędzi do konteneryzacji za pomocą Ansible}
-\begin{center}
-\includegraphics[scale=0.13]{img-ansibleinception.jpg}
-\end{center}
-\lstinputlisting[style=yaml,firstline=13]{../ansible/deploy-container-tools.yml}
+	\lstinputlisting[style=yaml]{../ansible/deploy-container-tools.yml}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -325,11 +333,31 @@ docker & rhel 8 compat & rhel 8 native   \\ \hline
 \end{frame}
 
 \begin{frame}[fragile]
-	\frametitle{Budowanie kontenera za pomocą {\tt ansible-bender}}
+	\frametitle{Budowanie obrazu kontenera za pomocą Ansible}
 %	\lstinputlisting[style=yaml]{../ansible/}
 \begin{itemize}
 	\item {\tt ansible-bender} vs {\tt ansible-container}?
+	\item {\tt ansible-bedner} nie jest jeszcze dostępny jako paczka systemowa -- jest w {\tt pip} i na GitHub
+	\item {\tt ansible-bender build container-provisioning.yml}
 \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Instalacja {\tt ansible-bender}}
+\begin{center}
+\includegraphics[scale=0.13]{img-ansibleinception.jpg}
+\end{center}
+\lstinputlisting[style=yaml,firstline=1,lastline=10]{../ansible/deploy-ansible-bender.yml}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Instalacja {\tt ansible-bender}}
+\lstinputlisting[style=yaml,firstline=11]{../ansible/deploy-ansible-bender.yml}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Tworzenie obrazów kontenerów z {\tt ansible-bender}}
+\lstinputlisting[style=yaml]{../ansible/container-provisioning.yml}
 \end{frame}
 
 \begin{frame}[fragile]
@@ -338,13 +366,13 @@ docker & rhel 8 compat & rhel 8 native   \\ \hline
 	\item{Wayland domyślnym serwerem dla aplikacji graficznych}
 	\item{Powrót do X11 w dalszym ciągu obsługiwany}
 	\item{GNOME 3.28}
-	\item \href{http://www.redhat.com}{Red Hat}
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Koniec\ldots}
 \begin{center}
+\href{https://github.com/OSEC-pl/osecforum-rhel8-news}{https://github.com/OSEC-pl/osecforum-rhel8-news}
 \includegraphics[scale=0.5]{img-oseclogo.png}
 
 Dziękuje!
