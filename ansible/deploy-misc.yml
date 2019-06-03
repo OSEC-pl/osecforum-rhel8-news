@@ -29,6 +29,10 @@
           - cockpit-session-recording
           - cockpit-storaged
           - cockpit-systemd
+    - name: Update packages
+      dnf:
+        name: '*'
+        state: latest
     - systemd:
         name: cockpit.socket
         state: started
