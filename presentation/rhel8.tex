@@ -124,18 +124,17 @@
 \end{center}
 \begin{itemize}
 	\item 8 Maja 2019 -- wydanie Red Hat Enterprise Linux 8
-	\item ,,Cloud-native OS''
-	\item ,,Brinding hybrid cloud to DevOps''
 	\item Co zmienia się od strony technicznej?
 	\item Ogromna ilość zmian -- część backportowana do RHEL 7
-	\item Zarządzanie konfiguracją RHEL\ldots
+	\item Zarządzanie konfiguracją
 	\begin{itemize}
 		\item Klasyczna Unixowa linia komend
 		\item Interfejs web (cockpit)
 		\item Ansible -- sukcesywne wdrażanie {\em Infrastructure as a Code}
 % System roles
 	\end{itemize}
-	\item Satellite + Insights + Ansible... %$\leftarrow Admin 2.0
+	\item Satellite + Insights + Ansible = Admin 2.0
+	\item Unixowe korzenie, nowe narzędzia
 \end{itemize}
 \begin{center}
 \end{center}
@@ -243,7 +242,7 @@
 
 % lorax-composer
 \begin{frame}
-	\frametitle{Budowanie własnych obrazów RHEL 8}
+	\frametitle{Budowanie własnych obrazów maszyn wirtualnych RHEL 8}
 	\begin{itemize}
 		\item {\tt lorax-composer} -- usługa budująca obrazy, oferująca REST API
 % lorax-composer
@@ -262,6 +261,7 @@
 	\item Silnik dla instalacji lokalnych, developmentu: podman
 	\item Silnik dla dużej skali (Kubernetes, OpenShift): \href{https://cri-o.io/}{CRI-O}
 	\item Red Hat Universal Base Images (UBI)
+	\item {\tt udica} -- generator polityk SELinuxa dla kontenerów (RHEL 8.1)
 % ipvlan w kontenerach
 \end{itemize}
 \end{frame}
@@ -319,16 +319,22 @@ docker & rhel 8 compat & rhel 8 native   \\ \hline
 
 \begin{frame}[fragile]
 	\frametitle{Instalacja narzędzi do konteneryzacji za pomocą Ansible}
-	\lstinputlisting[style=yaml]{../ansible/deploy-container-tools.yml}
+	\lstinputlisting[style=yaml,lastline=11]{../ansible/deploy-container-tools.yml}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Instalacja narzędzi do konteneryzacji za pomocą Ansible}
+	\lstinputlisting[style=yaml,firstline=12]{../ansible/deploy-container-tools.yml}
 \end{frame}
 
 \begin{frame}[fragile]
 	\frametitle{Budowanie kontenera za pomocą {\tt buildah}}
 \lstinputlisting[style=bash]{../buildah-example/build-container.sh}
 \begin{itemize}
-	\item {\tt mkdir \$HOME/tmp/logs}
+	\item {\tt mkdir -p \$HOME/tmp/logs}
 	\item {\tt sudo chcon -t container\_file\_t \$HOME/tmp/logs}
 	\item {\tt podman run -p 7777:7777 -v \$HOME/tmp/logs/:/logs/ localhost/bcaas}
+	\item {\tt -p} dla nieuprzywilejowanych kontenerów -- libpod issue \href{https://github.com/containers/libpod/issues/2081}{2081}
 \end{itemize}
 \end{frame}
 
